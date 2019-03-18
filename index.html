@@ -9,32 +9,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
-        @-webkit-keyframes greenPulse {
-    from { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
-  50% { background-color: #2daebf; -webkit-box-shadow: 0 0 18px #2daebf; }
-  to { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
-}
-
-    @-webkit-keyframes bluePulse {
-  from { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
-  50% { background-color: #2daebf; -webkit-box-shadow: 0 0 18px #2daebf; }
-  to { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
-}
-    #update-light {
-    border:0px;
-  -webkit-animation-name: greenPulse;
-  -webkit-animation-duration: 2s;
-  -webkit-animation-iteration-count: infinite;
-}
-    #update-fan {
-    border:0px;
-    -webkit-animation-name: bluePulse;
-  -webkit-animation-duration: 2s;
-  -webkit-animation-iteration-count: infinite;
-    }
-
-    .custom-radio {
-    }
     </style>
 </head>
 
@@ -87,7 +61,7 @@
                 </form>
           </div>
         </form>
-        <button class="btn btn-success btn-block btn-lg" id="update-light">UPDATE LIGHT STATE</button>
+        <button class="btn btn-primary btn-block btn-lg" id="update-light">UPDATE LIGHT STATE</button>
     </div>
   </div>
 </div>
@@ -107,6 +81,8 @@
               fetch(url,{ method:'PATCH', body:JSON.stringify(d)});
         }
         const update_fan_state = function(e){
+			btnUpdateFan.disabled = true;
+			window.setTimeout(enableButtonFan, 5000);
             var total_seconds = Number(numFanMin.value) * 60 + Number(numFanSec.value);
             var date = new Date();
             var timestamp = date.getTime();
@@ -116,6 +92,8 @@
 			patch_request(url, data);
         };
         const update_light_state = function(e){
+			btnUpdateLight.disabled = true;
+			window.setTimeout(enableButtonLight, 5000);
             var total_seconds = Number(numLightMin.value) * 60 + Number(numLightSec.value);
             var date = new Date();
             var timestamp = date.getTime();
@@ -124,6 +102,12 @@
             //put request
             patch_request(url,data);
         };
+		const enableButtonFan = function() {
+			btnUpdateFan.disabled = false;
+		}
+		const enableButtonLight = function() {
+			btnUpdateLight.disabled = false;
+		}
         numFanMin.value = 0;
         numFanSec.value = 0;
         numLightMin.value = 0;

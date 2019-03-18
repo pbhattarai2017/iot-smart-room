@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Smart Room using IoT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        @-webkit-keyframes greenPulse {
+    from { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
+  50% { background-color: #2daebf; -webkit-box-shadow: 0 0 18px #2daebf; }
+  to { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+    @-webkit-keyframes bluePulse {
+  from { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
+  50% { background-color: #2daebf; -webkit-box-shadow: 0 0 18px #2daebf; }
+  to { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
+}
+    #update-light {
+    border:0px;
+  -webkit-animation-name: greenPulse;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+}
+    #update-fan {
+    border:0px;
+    -webkit-animation-name: bluePulse;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+    }
+
+    .custom-radio {
+    }
+    </style>
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid text-center">
+  <h1>Home Automation</h1>
+  <p>An IoT project using RaspberryPI and Google Firebase</p> 
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <h3 class="display-4">Fan</h3>
+      <form>
+        <div class="form-group">
+              <label for="min-fan">Minutes:</label>
+              <input type="number" class="form-control" id="min-fan" min="0">
+              <label for="sec-fan">Seconds:</label>
+              <input type="number" class="form-control" id="sec-fan" min="0"> 
+              <form>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" id="fan-state-on" name="fan-state" value="true" checked>
+                    <label class="custom-control-label" for="fan-state-on">On</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" id="fan-state-off" name="fan-state" value="false">
+                    <label class="custom-control-label" for="fan-state-off">Off</label>
+                </div> 
+              </form> 
+        </div>
+      </form>
+      <button class="btn btn-primary btn-block btn-lg" id="update-fan">UPDATE FAN STATE</button>
+    </div>
+    <div class="col-sm-6">
+      <h3 class="display-4">Light</h3>
+      <form>
+          <div class="form-group">
+              <label for="min-light">Minutes:</label>
+              <input type="number" class="form-control" id="min-light" min="0">
+              <label for="sec-light">Seconds:</label>
+              <input type="number" class="form-control" id="sec-light" min="0">
+               <form>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="light-state-on" name="light-state" value="true" checked>
+                        <label class="custom-control-label" for="light-state-on">On</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="light-state-off" name="light-state" value="false">
+                        <label class="custom-control-label" for="light-state-off">Off</label>
+                    </div>
+                </form>
+          </div>
+        </form>
+        <button class="btn btn-success btn-block btn-lg" id="update-light">UPDATE LIGHT STATE</button>
+    </div>
+  </div>
+</div>
+    <script>
+        const numFanMin = document.getElementById("min-fan");
+        const numFanSec = document.getElementById("sec-fan");
+        const numLightMin = document.getElementById("min-light");
+        const numLightSec = document.getElementById("sec-light");
+        const btnUpdateLight = document.getElementById("update-light");
+        const btnUpdateFan = document.getElementById("update-fan");
+        const fan_radio_1 = document.getElementById("fan-state-on");
+        const fan_radio_2 = document.getElementById("fan-state-off");
+        const light_radio_1 = document.getElementById("light-state-on");
+        const light_radio_2 = document.getElementById("light-state-off");
+        const url = 'https://iot-smart-room.firebaseio.com/.json';
+        const patch_request = function(url, d) {
+              fetch(url,{ method:'PATCH', body:JSON.stringify(d)});
+        }
+        const update_fan_state = function(e){
+            var total_seconds = Number(numFanMin.value) * 60 + Number(numFanSec.value);
+            var date = new Date();
+            var timestamp = date.getTime();
+            var state = fan_radio_1.checked ? true : false;
+            var data = { "fan":[state,total_seconds,timestamp]};
+            //put request
+			patch_request(url, data);
+        };
+        const update_light_state = function(e){
+            var total_seconds = Number(numLightMin.value) * 60 + Number(numLightSec.value);
+            var date = new Date();
+            var timestamp = date.getTime();
+            var state = light_radio_1.checked ? true : false;
+            var data = { "light":[state,total_seconds,timestamp]};
+            //put request
+            patch_request(url,data);
+        };
+        numFanMin.value = 0;
+        numFanSec.value = 0;
+        numLightMin.value = 0;
+        numLightSec.value = 0;
+        btnUpdateLight.addEventListener('click',update_light_state);
+        btnUpdateFan.addEventListener('click',update_fan_state);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

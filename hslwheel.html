@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Web Graphics using SVG and Javascript</title>
+    <style>
+        .box {
+            position: fixed;
+            left: 400px;
+            top: 100px;
+        }
+        #circular:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <p id="demo">COLOR WHEEL</p>
+    <svg class="box" width="400" height="400">
+        <circle id="circular" cx="200" cy="200" r="200" fill="black" />
+    </svg>
+    <script type="text/javascript">
+        let cir = document.getElementById('circular');
+        function randint(min, max) {
+            return Math.floor(Math.random() * ( max - min + 1 )) + min;
+        }
+        function change_size() {
+            cir.setAttribute('r',randint(10,20));
+        }
+        function change_fill(h,s) {
+            //fill the color using HSL
+            let color = `hsl(${h}, ${s}%, 50%)`;
+            cir.setAttribute('fill',color);
+        }
+        document.addEventListener('mousemove', (e) => {
+            let x = e.clientX - 600;
+            let y = e.clientY - 300;
+            let dist = Math.hypot(x, y);
+            if ( dist <= 200 ) {
+                //it is within the circle
+                //call HSL
+                let t = Math.acos(x / dist);
+                if ( y >= 0 ) {
+                    t = Math.abs(t - Math.PI) + Math.PI;
+                }
+                //document.getElementById('demo').innerHTML = t;
+                let saturation = Math.trunc( ( dist / 200 ) * 100 );
+                let hue = Math.trunc( ( t / ( 2 * Math.PI ) ) * 360 );
+                change_fill(hue, saturation);
+            }
+        });
+    </script>
+</body>
+</html>
